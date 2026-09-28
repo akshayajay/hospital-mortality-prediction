@@ -55,7 +55,26 @@ These values are transcribed from the notebook's saved tuning and full-metrics o
 | **Gradient Boosting** | **0.9181** | **0.9160** | 0.8440 | 0.6626 | 0.8114 | 0.7295 |
 | RBF SVM | 0.9128 | 0.9105 | 0.8710 | 0.7926 | 0.6801 | 0.7320 |
 
-Gradient Boosting has the highest saved validation and test ROC-AUC, with learning rate 0.1, 100 estimators, and maximum depth 3. The majority-class baseline has 0.741 accuracy and zero positive-class F1.
+Gradient Boosting has the highest saved validation and test ROC-AUC. RBF SVM has the highest test accuracy and precision; Logistic Regression has the highest test F1. Logistic Regression and Random Forest tie for the highest test recall. “Best model” here refers to ROC-AUC, not every classification metric. The majority-class baseline has 0.741 accuracy and zero positive-class F1.
+
+The saved grid-search output reports these selected parameters (`model__` prefixes omitted):
+
+| Model | Selected parameters |
+| --- | --- |
+| Logistic Regression | `C=0.1`, `class_weight=None` |
+| Decision Tree | `max_depth=5`, `min_samples_leaf=10`, `max_features=None`, `class_weight=None` |
+| Random Forest | `n_estimators=300`, `max_depth=None`, `min_samples_leaf=5`, `max_features='sqrt'`, `class_weight='balanced'` |
+| Gradient Boosting | `learning_rate=0.1`, `n_estimators=100`, `max_depth=3` |
+| RBF SVM | `C=1`, `gamma=0.01`, `class_weight=None` |
+
+`class_weight=None` does not mean unweighted training: the tuning loop passes balanced sample weights to every classifier.
+
+The saved confusion matrix at threshold 0.5 agrees with the Gradient Boosting metrics above:
+
+| Actual outcome | Predicted no hospital death | Predicted hospital death |
+| --- | ---: | ---: |
+| No hospital death | 1,154 | 195 |
+| Hospital death | 89 | 383 |
 
 ### Repeated-split analysis
 
@@ -85,12 +104,12 @@ These quantities measure different forms of model importance and are not directl
 
 ## Open the analysis
 
-Use Python 3.11, matching the utility-test CI configuration:
+The notebook's saved installation output shows a Python 3.12 environment with NumPy 2.0.2, pandas 2.2.2, XGBoost 3.1.2, and ucimlrepo 0.0.7. The utility-test CI separately uses Python 3.11; it does not run the notebook. The example below uses Python 3.12, but the repository does not pin a complete environment for reproducing the saved results.
 
 ```bash
 git clone https://github.com/akshayajay/hospital-mortality-prediction.git
 cd hospital-mortality-prediction
-python3.11 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m pip install ucimlrepo shap
@@ -99,7 +118,14 @@ jupyter notebook mortality_prediction.ipynb
 
 `ucimlrepo` and `shap` are imported by the notebook but are currently missing from `requirements.txt`, so they are installed explicitly above. The notebook downloads SUPPORT2 directly from UCI; no manually placed `data/support2.csv` is read. Internet access is required for the download.
 
-You can inspect the saved outputs immediately. Before rerunning all cells, address the missing model-selection assignment above. The full grid search repeatedly fits XGBoost-based imputers and can be computationally expensive; the commands above are not a verified fresh reproduction of the saved scores.
+You can inspect the saved outputs immediately. To address the missing model-selection assignment before rerunning the ROC and interpretation cells, insert the following after the tuning loop and before the cell beginning `# Plot ROC curve on test set for the chosen best model`:
+
+```python
+best_model_name = max(results, key=lambda result: result[1])[0]
+best_model = best_models[best_model_name]
+```
+
+This selects the model by validation ROC-AUC (`result[1]`); the saved table selects `gb`. These lines are a required notebook correction, not code already present in the committed notebook. The full grid search repeatedly fits XGBoost-based imputers and can be computationally expensive; the commands above are not a verified fresh reproduction of the saved scores.
 
 To run the existing utility tests without downloading data or training models:
 
