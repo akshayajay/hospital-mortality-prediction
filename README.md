@@ -104,7 +104,7 @@ These quantities measure different forms of model importance and are not directl
 
 ## Open the analysis
 
-The notebook's saved installation output shows a Python 3.12 environment with NumPy 2.0.2, pandas 2.2.2, XGBoost 3.1.2, and ucimlrepo 0.0.7. The utility-test CI separately uses Python 3.11; it does not run the notebook. The example below uses Python 3.12, but the repository does not pin a complete environment for reproducing the saved results.
+The notebook's saved installation output shows a Python 3.12 environment with NumPy 2.0.2, pandas 2.2.2, XGBoost 3.1.2, and ucimlrepo 0.0.7. The utility-test CI separately uses Python 3.14; it does not run the notebook. The example below uses Python 3.12, but the repository does not pin a complete environment for reproducing the saved results.
 
 ```bash
 git clone https://github.com/akshayajay/hospital-mortality-prediction.git

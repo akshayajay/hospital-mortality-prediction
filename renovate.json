@@ -1,9 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
+
+  "dependencyDashboardAutoclose": true,
 
   "timezone": "Asia/Kolkata",
-  "schedule": ["every weekend"],
+  "schedule": ["* * * * 0,6"],
 
   "automerge": true,
   "automergeType": "pr",
@@ -16,7 +18,7 @@
       "matchUpdateTypes": ["patch", "minor"],
       "matchCategories": ["security"],
       "automerge": true,
-      "schedule": ["at any time"],
+      "schedule": ["* * * * *"],
       "labels": ["security", "automerge"]
     },
     {
@@ -47,7 +49,7 @@
 
   "vulnerabilityAlerts": {
     "enabled": true,
-    "schedule": ["at any time"],
+    "schedule": ["* * * * *"],
     "automerge": true,
     "labels": ["security", "vulnerability"]
   },
